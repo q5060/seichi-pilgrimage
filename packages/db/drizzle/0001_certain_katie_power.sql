@@ -1,0 +1,2 @@
+ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_user_id_target_type_target_id_unique" UNIQUE("user_id","target_type","target_id");--> statement-breakpoint
+ALTER TABLE "likes" ADD CONSTRAINT "likes_user_id_target_type_target_id_unique" UNIQUE("user_id","target_type","target_id");

@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Twilight ink — single 222° hue axis, muted steel-blue accent */
+    --background: 222 36% 7%;
+    --foreground: 220 20% 91%;
+    --surface: 222 28% 11%;
+    --elevated: 222 24% 14%;
+    --card: 222 26% 12%;
+    --card-foreground: 220 20% 91%;
+    --popover: 222 26% 12%;
+    --popover-foreground: 220 20% 91%;
+    --primary: 214 42% 58%;
+    --primary-foreground: 222 36% 7%;
+    --secondary: 222 22% 16%;
+    --secondary-foreground: 220 16% 84%;
+    --muted: 222 20% 15%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 214 32% 48%;
+    --accent-foreground: 220 20% 94%;
+    --destructive: 0 48% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 158 30% 44%;
+    --success-foreground: 158 20% 90%;
+    --warning: 36 40% 54%;
+    --warning-foreground: 36 30% 92%;
+    --border: 222 18% 22%;
+    --input: 222 22% 16%;
+    --ring: 214 42% 58%;
+    --radius: 0.625rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-page text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .glass {
+    @apply border border-border/50 bg-surface/80 backdrop-blur-xl;
+  }
+
+  .glow-brand {
+    @apply shadow-glow;
+  }
+
+  .text-display {
+    @apply font-display text-4xl font-bold tracking-tight md:text-5xl;
+  }
+
+  .text-title {
+    @apply font-display text-2xl font-bold tracking-tight md:text-3xl;
+  }
+
+  .text-body {
+    @apply text-base leading-relaxed text-foreground;
+  }
+
+  .text-caption {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-elevated transition-colors hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-elevated transition-colors hover:bg-elevated;
+  }
+
+  .card {
+    @apply rounded-xl border border-border/60 bg-card shadow-elevated transition-shadow;
+  }
+
+  .snap-scroll {
+    @apply flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 scrollbar-thin;
+  }
+}
+
+@layer utilities {
+  .bg-page {
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -30%, hsl(214 42% 58% / 0.06), transparent 55%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(222 36% 6%) 100%);
+  }
+
+  .border-subtle {
+    @apply border-border/50;
+  }
+
+  .shadow-elevated {
+    box-shadow:
+      0 1px 2px hsl(222 36% 4% / 0.4),
+      0 4px 20px -6px hsl(222 36% 4% / 0.5);
+  }
+
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-brand-200 via-brand-300 to-brand-200 bg-clip-text text-transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+}

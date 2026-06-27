@@ -1,0 +1,90 @@
+{
+  "common": {
+    "siteName": "聖地巡礼",
+    "save": "保存",
+    "saved": "保存しました！",
+    "loading": "読み込み中...",
+    "language": "言語",
+    "zhTW": "繁體中文",
+    "ja": "日本語"
+  },
+  "nav": {
+    "exploreSpots": "聖地を探す",
+    "search": "検索",
+    "travelogue": "旅行記",
+    "feed": "タイムライン",
+    "leaderboard": "ランキング",
+    "explore": "探索",
+    "my": "マイページ",
+    "bookmarks": "ブックマーク",
+    "profile": "プロフィール",
+    "map": "地図",
+    "notifications": "通知",
+    "routes": "ルート",
+    "more": "もっと見る",
+    "closeMore": "閉じる"
+  },
+  "settings": {
+    "title": "アカウント設定",
+    "description": "プロフィールとプライバシー設定",
+    "email": "メール",
+    "bio": "自己紹介",
+    "name": "表示名",
+    "username": "ユーザー名",
+    "defaultPrivacy": "デフォルト公開範囲",
+    "privacyPublic": "公開",
+    "privacyFollowers": "フォロワーのみ",
+    "privacyPrivate": "非公開",
+    "showOnLeaderboard": "ランキングに表示",
+    "showOnLeaderboardHint": "オフにすると貢献度やチェックイン数が公開ランキングに表示されません",
+    "languageHint": "表示言語を切り替えます。日本語では聖地・作品名を日本語表記を優先します",
+    "saveFailed": "保存に失敗しました",
+    "loadFailed": "設定を読み込めませんでした"
+  },
+  "feed": {
+    "title": "タイムライン",
+    "description": "フォロー中の巡礼者の更新が表示されます",
+    "filterAll": "すべて",
+    "filterVisit": "チェックイン",
+    "filterTravelogue": "旅行記",
+    "filterPhoto": "写真",
+    "filterReport": "現況報告",
+    "filterRoute": "ルート",
+    "filterSpotEdit": "聖地編集",
+    "filterFollow": "フォロー",
+    "filterList": "リスト",
+    "emptyTitle": "まだ投稿がありません",
+    "emptyAll": "他の巡礼者をフォローして更新を見ましょう",
+    "emptyFiltered": "この種類の投稿はまだありません",
+    "exploreUsers": "巡礼者を探す",
+    "loadFailed": "読み込みに失敗しました",
+    "loadMore": "もっと見る",
+    "loadingMore": "読み込み中...",
+    "actions": {
+      "visit": "チェックインしました",
+      "travelogue": "旅行記を公開しました",
+      "photo": "写真をアップロードしました",
+      "spotEdit": "聖地を編集しました",
+      "locationReport": "現況を報告しました",
+      "follow": "フォローしました",
+      "route": "ルートを作成しました",
+      "list": "リストを作成しました"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "empty": "通知はありません",
+    "markAllRead": "すべて既読",
+    "viewAll": "すべて見る"
+  },
+  "spots": {
+    "visitCount": "チェックイン {count} 回",
+    "prefecture": "都道府県",
+    "status": "状態",
+    "transport": "交通"
+  },
+  "empty": {
+    "noResults": "結果がありません",
+    "tryAgain": "しばらくしてからお試しください"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "common": {
+    "siteName": "聖地巡禮",
+    "save": "儲存",
+    "saved": "已儲存！",
+    "loading": "載入中...",
+    "language": "語言",
+    "zhTW": "繁體中文",
+    "ja": "日本語"
+  },
+  "nav": {
+    "exploreSpots": "探索聖地",
+    "search": "搜尋",
+    "travelogue": "遊記",
+    "feed": "動態",
+    "leaderboard": "排行榜",
+    "explore": "探索",
+    "my": "我的",
+    "bookmarks": "收藏",
+    "profile": "個人檔案",
+    "map": "地圖",
+    "notifications": "通知",
+    "routes": "路線",
+    "more": "更多",
+    "closeMore": "關閉"
+  },
+  "settings": {
+    "title": "帳號設定",
+    "description": "管理個人資料與隱私偏好",
+    "email": "Email",
+    "bio": "簡介",
+    "name": "顯示名稱",
+    "username": "使用者名稱",
+    "defaultPrivacy": "預設隱私",
+    "privacyPublic": "公開",
+    "privacyFollowers": "僅追蹤者",
+    "privacyPrivate": "私密",
+    "showOnLeaderboard": "顯示於排行榜",
+    "showOnLeaderboardHint": "關閉後你的貢獻分與打卡數不會出現在公開排行榜",
+    "languageHint": "切換介面語言；日文模式下聖地與作品名稱優先顯示日文",
+    "saveFailed": "儲存失敗",
+    "loadFailed": "無法載入設定"
+  },
+  "feed": {
+    "title": "動態牆",
+    "description": "追蹤其他巡禮者後，會優先顯示他們的更新",
+    "filterAll": "全部",
+    "filterVisit": "打卡",
+    "filterTravelogue": "遊記",
+    "filterPhoto": "照片",
+    "filterReport": "現況回報",
+    "filterRoute": "路線",
+    "filterSpotEdit": "聖地編輯",
+    "filterFollow": "追蹤",
+    "filterList": "清單",
+    "emptyTitle": "尚無動態",
+    "emptyAll": "追蹤其他巡禮者以查看他們的更新",
+    "emptyFiltered": "此類型尚無動態",
+    "exploreUsers": "探索巡禮者",
+    "loadFailed": "載入失敗",
+    "loadMore": "載入更多",
+    "loadingMore": "載入中...",
+    "actions": {
+      "visit": "打卡了",
+      "travelogue": "發布了遊記",
+      "photo": "上傳了照片",
+      "spotEdit": "編輯了聖地",
+      "locationReport": "回報了現況",
+      "follow": "開始追蹤",
+      "route": "建立了路線",
+      "list": "建立了清單"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "empty": "尚無通知",
+    "markAllRead": "全部標為已讀",
+    "viewAll": "查看全部"
+  },
+  "spots": {
+    "visitCount": "{count} 次打卡",
+    "prefecture": "都道府縣",
+    "status": "狀態",
+    "transport": "交通"
+  },
+  "empty": {
+    "noResults": "找不到結果",
+    "tryAgain": "請稍後再試"
+  }
+}

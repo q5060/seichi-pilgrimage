@@ -1,0 +1,26 @@
+{
+  "name": "seichi-pilgrimage",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "workers"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @seichi/web",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npm run start -w @seichi/web",
+    "db:generate": "npm run generate -w @seichi/db",
+    "db:migrate": "npm run migrate -w @seichi/db",
+    "db:seed": "npm run seed -w @seichi/db",
+    "db:import-spots": "npm run import-spots -w @seichi/db",
+    "worker": "npm run dev -w @seichi/worker",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run build -w @seichi/shared && tsc -p apps/web --noEmit",
+    "test": "npm run test -w @seichi/web",
+    "test:e2e": "npm run test:e2e -w @seichi/web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

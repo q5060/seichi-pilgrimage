@@ -1,0 +1,22 @@
+{
+  "name": "@seichi/worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@seichi/db": "*",
+    "@seichi/shared": "*",
+    "bullmq": "^5.34.2",
+    "drizzle-orm": "^0.38.1",
+    "ioredis": "^5.4.2",
+    "meilisearch": "^0.45.0",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
