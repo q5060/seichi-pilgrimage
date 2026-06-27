@@ -8,8 +8,8 @@ test.describe("smoke", () => {
 
   test("search page loads with skeleton or results area", async ({ page }) => {
     await page.goto("/search");
-    await expect(page.getByRole("heading", { name: "搜尋" })).toBeVisible();
-    await page.getByPlaceholder(/搜尋/).fill("東京");
+    await expect(page.getByRole("heading", { name: "搜尋", level: 1 })).toBeVisible();
+    await page.getByPlaceholder(/作品名|聖地|遊記/).fill("東京");
     await page.locator("#search-form").press("Enter");
     await expect(page.locator(".animate-pulse, [class*='skeleton']").first()).toBeVisible({
       timeout: 5000,
@@ -21,10 +21,10 @@ test.describe("smoke", () => {
   test("spots list navigation", async ({ page }) => {
     await page.goto("/spots");
     await expect(page.getByRole("link").first()).toBeVisible();
-    const spotLink = page.locator('a[href^="/spots/"]').first();
+    const spotLink = page.locator('main a[href^="/spots/"]:not([href="/spots/map"])').first();
     if (await spotLink.count()) {
       await spotLink.click();
-      await expect(page).toHaveURL(/\/spots\//);
+      await expect(page).toHaveURL(/\/spots\/[^/]+$/);
     }
   });
 
