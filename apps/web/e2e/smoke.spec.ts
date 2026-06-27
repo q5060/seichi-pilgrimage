@@ -45,7 +45,7 @@ test.describe("smoke", () => {
   }) => {
     await page.goto("/lists/new");
     await expect(
-      page.getByRole("heading", { name: /新增清單|登入|Sign in/i })
+      page.getByRole("heading", { name: /新增清單|登入聖地巡禮/i })
     ).toBeVisible();
   });
 
