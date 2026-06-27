@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import type { AnimeTitles } from "@seichi/shared";
 import { db } from "./index";
 import {
   anime,
@@ -29,7 +30,7 @@ function mediaToDbFormat(media: {
       romaji: media.title.romaji,
       english: media.title.english,
       native: media.title.native,
-    },
+    } as AnimeTitles,
     coverImage: media.coverImage?.large ?? null,
     bannerImage: media.bannerImage ?? null,
     format: media.format ?? null,

@@ -21,7 +21,7 @@ export async function getSimilarSpots(spotId: string, limit = 6) {
 
     const animeIds = links.map((l) => l.anilistId);
 
-    let relatedIds: string[] = [];
+    const relatedIds: string[] = [];
 
     if (animeIds.length > 0) {
       const sameAnime = await db
