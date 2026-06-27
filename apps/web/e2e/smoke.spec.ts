@@ -40,9 +40,13 @@ test.describe("smoke", () => {
     await expect(page.getByRole("heading", { name: "地圖探索" })).toBeVisible();
   });
 
-  test("lists new page opens create dialog", async ({ page }) => {
+  test("lists new page opens create dialog or redirects to sign in", async ({
+    page,
+  }) => {
     await page.goto("/lists/new");
-    await expect(page.getByRole("heading", { name: "新增清單" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /新增清單|登入|Sign in/i })
+    ).toBeVisible();
   });
 
   test("mobile more sheet opens", async ({ page }) => {

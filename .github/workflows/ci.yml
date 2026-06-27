@@ -56,8 +56,30 @@ jobs:
         run: npm run build -w @seichi/web
         env:
           CI: true
+          AUTH_SECRET: ci-e2e-secret-at-least-32-characters-long
 
       - name: E2E smoke
-        run: npm run test:e2e -w @seichi/web
+        run: |
+          npm run start -w @seichi/web &
+          SERVER_PID=$!
+          echo "Waiting for http://localhost:3000 ..."
+          for i in $(seq 1 90); do
+            if curl -sf -o /dev/null http://localhost:3000; then
+              echo "Server ready"
+              break
+            fi
+            if [ "$i" -eq 90 ]; then
+              echo "Server failed to start within 180s"
+              kill "$SERVER_PID" 2>/dev/null || true
+              exit 1
+            fi
+            sleep 2
+          done
+          npm run test:e2e -w @seichi/web
+          kill "$SERVER_PID" 2>/dev/null || true
         env:
           CI: true
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          AUTH_SECRET: ci-e2e-secret-at-least-32-characters-long
+          AUTH_URL: http://localhost:3000
+          AUTH_TRUST_HOST: "true"
