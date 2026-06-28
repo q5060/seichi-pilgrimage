@@ -77,4 +77,36 @@ test.describe("smoke", () => {
     await page.goto("/search");
     await expect(page.getByRole("heading", { name: "検索", level: 1 })).toBeVisible();
   });
+
+  test("anime browse page loads", async ({ page }) => {
+    await page.goto("/anime");
+    await expect(page.getByRole("heading", { name: "作品瀏覽", level: 1 })).toBeVisible();
+    await expect(page.getByRole("link", { name: "本季新番" })).toBeVisible();
+  });
+
+  test("list detail loads after creating a list", async ({ page }) => {
+    await page.goto("/auth/signin");
+    await page.getByRole("button", { name: "開發用登入" }).click();
+    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
+
+    await page.goto("/lists/new");
+    await page.getByPlaceholder("清單名稱").fill("E2E 測試清單");
+    await page.getByRole("button", { name: "建立" }).click();
+    await page.waitForURL(/\/lists\/[^/]+/, { timeout: 15000 });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  });
+
+  test("anime score saves without changing status", async ({ page }) => {
+    await page.goto("/auth/signin");
+    await page.getByRole("button", { name: "開發用登入" }).click();
+    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
+
+    await page.goto("/anime/21617");
+    await page.getByLabel("評分（1–10）").fill("9");
+    await page.getByRole("button", { name: "儲存評價" }).click();
+    await expect(page.getByText("已儲存")).toBeVisible({ timeout: 10000 });
+
+    await page.reload();
+    await expect(page.getByLabel("評分（1–10）")).toHaveValue("9");
+  });
 });

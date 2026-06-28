@@ -27,7 +27,7 @@ import {
   Sparkles,
   List,
 } from "lucide-react";
-import { getProfileSummary } from "@/lib/profile-data";
+import { getProfileSummary, getProfileAnimeStats } from "@/lib/profile-data";
 import { getWrappedStats } from "@/lib/wrapped-data";
 import { JapanMap } from "@/components/profile/japan-map-loader";
 import { ProfileTabNav, type ProfileTab } from "@/components/profile/profile-tab-nav";
@@ -110,6 +110,7 @@ export default async function UserProfilePage({
 
   const [
     profileSummary,
+    animeStats,
     visitList,
     userTravelogues,
     userLists,
@@ -117,6 +118,7 @@ export default async function UserProfilePage({
     animeRows,
   ] = await Promise.all([
     getProfileSummary(userId),
+    activeTab === "overview" ? getProfileAnimeStats(userId) : Promise.resolve(null),
     activeTab === "visits" || activeTab === "overview"
       ? db
           .select({ visit: visits, spot: spots })
@@ -295,6 +297,65 @@ export default async function UserProfilePage({
             )}
 
             <section>
+              <SectionHeader title="巡禮統計" />
+              {animeStats && animeStats.animeTotal > 0 ? (
+                <div className="mt-4 space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <StatPill label="追蹤作品" value={String(animeStats.animeTotal)} />
+                    {animeStats.averageScore != null && (
+                      <StatPill
+                        label="平均評分"
+                        value={`${animeStats.averageScore}/10`}
+                      />
+                    )}
+                    {animeStats.suggestedPilgrimageDays > 0 && (
+                      <StatPill
+                        label="建議巡禮天數"
+                        value={`${animeStats.suggestedPilgrimageDays} 天`}
+                      />
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {PILGRIMAGE_STATUSES.map((s) =>
+                      animeStats.statusCounts[s] > 0 ? (
+                        <Badge key={s} variant="secondary">
+                          {PILGRIMAGE_STATUS_LABELS[s]} {animeStats.statusCounts[s]}
+                        </Badge>
+                      ) : null
+                    )}
+                  </div>
+                  {animeStats.topGenres.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">偏好類型</p>
+                      {animeStats.topGenres.map(({ genre, count: genreCount }) => {
+                        const max = animeStats.topGenres[0]?.count ?? 1;
+                        const pct = Math.round((genreCount / max) * 100);
+                        return (
+                          <div key={genre} className="flex items-center gap-3 text-sm">
+                            <span className="w-28 shrink-0 truncate">{genre}</span>
+                            <div className="h-2 flex-1 overflow-hidden rounded-full bg-elevated">
+                              <div
+                                className="h-full rounded-full bg-primary/70"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="w-6 text-right text-muted-foreground">
+                              {genreCount}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  尚無作品巡禮紀錄
+                </p>
+              )}
+            </section>
+
+            <section>
               <SectionHeader title="巡禮版圖" />
               <div className="mt-4">
                 <JapanMap visitedPrefectures={prefectureList.map((p) => p.prefecture)} />
@@ -424,6 +485,7 @@ export default async function UserProfilePage({
                 coverImage: r.anime.coverImage,
                 status: r.status.status,
                 score: r.status.score,
+                review: r.status.review,
                 visitedSpotCount: r.status.visitedSpotCount,
                 spotCount: r.spotCount ?? 0,
               }))}

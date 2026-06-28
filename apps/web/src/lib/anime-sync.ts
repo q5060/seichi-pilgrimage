@@ -36,10 +36,9 @@ export async function syncAnimeById(anilistId: number) {
   return media;
 }
 
-export async function searchAndSyncAnime(query: string): Promise<AniListMedia[]> {
-  const results = await searchAnime(query);
-  const slice = results.slice(0, 10);
-  if (slice.length === 0) return results;
+export async function syncAnimeMediaBatch(mediaList: AniListMedia[]) {
+  const slice = mediaList.slice(0, 50);
+  if (slice.length === 0) return;
 
   const syncedAt = new Date();
   const rows = slice.map((media) => ({
@@ -69,9 +68,24 @@ export async function searchAndSyncAnime(query: string): Promise<AniListMedia[]>
     });
 
   for (const media of slice) {
+    const existing = await db
+      .select()
+      .from(animePilgrimageMeta)
+      .where(eq(animePilgrimageMeta.anilistId, media.id))
+      .limit(1);
+    if (existing.length === 0) {
+      await db.insert(animePilgrimageMeta).values({ anilistId: media.id });
+    }
     triggerAnimeIndexing(media.id);
   }
+}
 
+export async function searchAndSyncAnime(query: string): Promise<AniListMedia[]> {
+  const results = await searchAnime(query);
+  const slice = results.slice(0, 10);
+  if (slice.length === 0) return results;
+
+  await syncAnimeMediaBatch(slice);
   return results;
 }
 

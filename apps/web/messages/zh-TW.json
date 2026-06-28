@@ -19,6 +19,7 @@
     "travelogue": "遊記",
     "feed": "動態",
     "leaderboard": "排行榜",
+    "animeBrowse": "作品",
     "explore": "探索",
     "my": "我的",
     "bookmarks": "收藏",
@@ -168,5 +169,13 @@
   "empty": {
     "noResults": "找不到結果",
     "tryAgain": "請稍後再試"
+  },
+  "animeBrowse": {
+    "title": "作品瀏覽",
+    "description": "探索本季新番、熱門作品與有聖地巡禮的作品",
+    "loadFailed": "無法載入作品",
+    "loadFailedHint": "AniList 連線暫時不可用，請稍後再試",
+    "empty": "尚無作品",
+    "emptyHint": "試試其他季節或類型篩選"
   }
 }

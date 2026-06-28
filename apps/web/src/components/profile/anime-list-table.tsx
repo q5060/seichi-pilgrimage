@@ -14,6 +14,7 @@ export interface AnimeListRow {
   coverImage?: string | null;
   status: PilgrimageStatus;
   score?: number | null;
+  review?: string | null;
   visitedSpotCount: number;
   spotCount: number;
 }
@@ -73,6 +74,11 @@ function AnimeListCard({ row }: { row: AnimeListRow }) {
             </span>
           </div>
         </div>
+        {row.review && (
+          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+            {row.review}
+          </p>
+        )}
       </div>
       <div className="shrink-0 self-center text-sm font-medium text-primary">
         {row.score != null ? row.score.toFixed(1) : "—"}
@@ -151,6 +157,11 @@ export function AnimeListTable({
                       </div>
                       <div className="min-w-0">
                         <AnimeRowTitle titles={row.titles} />
+                        {row.review && (
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {row.review}
+                          </p>
+                        )}
                       </div>
                     </Link>
                   </td>

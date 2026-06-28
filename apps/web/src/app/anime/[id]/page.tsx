@@ -1,5 +1,5 @@
-import { db, spots, spotAnimeLinks, animePilgrimageMeta, travelogues, userAnimeStatus, photos, likes } from "@seichi/db";
-import { eq, desc, and, sql, inArray } from "drizzle-orm";
+import { db, spots, spotAnimeLinks, animePilgrimageMeta, travelogues, userAnimeStatus, photos, likes, users } from "@seichi/db";
+import { eq, desc, and, sql, inArray, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -24,6 +24,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { AnimeMetaEditForm } from "@/components/anime/meta-edit-form";
 import { MapPin } from "lucide-react";
 import { AnimeSpotMap } from "@/components/anime/anime-spot-map";
+import { AddToListButton } from "@/components/spots/add-to-list-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -51,6 +53,29 @@ async function getRelatedTravelogues(anilistId: number, spotIds: string[]) {
       )
     )
     .orderBy(desc(travelogues.publishedAt))
+    .limit(5);
+}
+
+async function getAnimePublicReviews(anilistId: number) {
+  return db
+    .select({
+      review: userAnimeStatus.review,
+      score: userAnimeStatus.score,
+      updatedAt: userAnimeStatus.updatedAt,
+      userId: users.id,
+      userName: users.name,
+      userImage: users.image,
+    })
+    .from(userAnimeStatus)
+    .innerJoin(users, eq(userAnimeStatus.userId, users.id))
+    .where(
+      and(
+        eq(userAnimeStatus.anilistId, anilistId),
+        isNotNull(userAnimeStatus.review),
+        sql`trim(${userAnimeStatus.review}) != ''`
+      )
+    )
+    .orderBy(desc(userAnimeStatus.updatedAt))
     .limit(5);
 }
 
@@ -101,7 +126,7 @@ export default async function AnimePage({
         .limit(1)
     : Promise.resolve([]);
 
-  const [metaRows, spotLinks, userStatusRows] = await Promise.all([
+  const [metaRows, spotLinks, userStatusRows, publicReviews] = await Promise.all([
     db
       .select()
       .from(animePilgrimageMeta)
@@ -113,6 +138,7 @@ export default async function AnimePage({
       .innerJoin(spots, eq(spotAnimeLinks.spotId, spots.id))
       .where(eq(spotAnimeLinks.anilistId, anilistId)),
     userStatusPromise,
+    getAnimePublicReviews(anilistId),
   ]);
 
   const meta = metaRows[0];
@@ -236,6 +262,7 @@ export default async function AnimePage({
 
             <div className="flex flex-wrap items-center gap-3">
               <AnimeFollowButton anilistId={anilistId} />
+              <AddToListButton anilistId={anilistId} iconOnly />
               <ContentSocialBar
                 targetType="anime"
                 targetId={String(anilistId)}
@@ -264,6 +291,49 @@ export default async function AnimePage({
         <FadeIn delay={0.05}>
           <AnimeStatusButton anilistId={anilistId} />
         </FadeIn>
+
+        {publicReviews.length > 0 && (
+          <FadeIn delay={0.06}>
+            <section>
+              <SectionHeader title="巡禮心得" />
+              <div className="mt-4 space-y-3">
+                {publicReviews.map((entry) => (
+                  <Card key={`${entry.userId}-${entry.updatedAt}`} className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Link href={`/users/${entry.userId}`}>
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={entry.userImage ?? undefined} />
+                          <AvatarFallback>
+                            {entry.userName?.slice(0, 1) ?? "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link
+                            href={`/users/${entry.userId}`}
+                            className="text-sm font-medium hover:text-primary"
+                          >
+                            {entry.userName}
+                          </Link>
+                          {entry.score != null && (
+                            <Badge variant="secondary">{entry.score}/10</Badge>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(entry.updatedAt)}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          {entry.review}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          </FadeIn>
+        )}
 
         {session?.user?.id && (
           <FadeIn delay={0.08}>

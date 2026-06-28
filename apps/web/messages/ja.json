@@ -19,6 +19,7 @@
     "travelogue": "旅行記",
     "feed": "タイムライン",
     "leaderboard": "ランキング",
+    "animeBrowse": "作品",
     "explore": "探索",
     "my": "マイページ",
     "bookmarks": "ブックマーク",
@@ -168,5 +169,13 @@
   "empty": {
     "noResults": "結果がありません",
     "tryAgain": "しばらくしてからお試しください"
+  },
+  "animeBrowse": {
+    "title": "作品を探す",
+    "description": "今期アニメ、トレンド、聖地がある作品を探索",
+    "loadFailed": "作品を読み込めません",
+    "loadFailedHint": "AniList への接続に失敗しました。後でもう一度お試しください",
+    "empty": "作品がありません",
+    "emptyHint": "別のシーズンやジャンルをお試しください"
   }
 }

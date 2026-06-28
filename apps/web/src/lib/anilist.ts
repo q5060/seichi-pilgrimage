@@ -49,15 +49,48 @@ const SEARCH_QUERY = `
   }
 `;
 
-const TRENDING_QUERY = `
-  query ($page: Int, $perPage: Int) {
+const SEASON_QUERY = `
+  query ($season: MediaSeason, $seasonYear: Int, $page: Int, $perPage: Int, $genre_in: [String]) {
     Page(page: $page, perPage: $perPage) {
-      media(type: ANIME, sort: TRENDING_DESC) {
+      media(
+        season: $season
+        seasonYear: $seasonYear
+        type: ANIME
+        sort: POPULARITY_DESC
+        genre_in: $genre_in
+      ) {
         id
         title { romaji english native }
         coverImage { large }
+        bannerImage
+        format
+        status
         episodes
+        season
         seasonYear
+        genres
+        description
+        averageScore
+      }
+    }
+  }
+`;
+
+const TRENDING_QUERY = `
+  query ($page: Int, $perPage: Int, $genre_in: [String]) {
+    Page(page: $page, perPage: $perPage) {
+      media(type: ANIME, sort: TRENDING_DESC, genre_in: $genre_in) {
+        id
+        title { romaji english native }
+        coverImage { large }
+        bannerImage
+        format
+        status
+        episodes
+        season
+        seasonYear
+        genres
+        description
         averageScore
       }
     }
@@ -99,13 +132,41 @@ export async function searchAnime(
   return data.Page.media;
 }
 
+export type MediaSeason = "WINTER" | "SPRING" | "SUMMER" | "FALL";
+
+export async function fetchSeasonAnime(
+  season: MediaSeason,
+  seasonYear: number,
+  page = 1,
+  perPage = 24,
+  genre?: string
+): Promise<AniListMedia[]> {
+  const variables: Record<string, unknown> = {
+    season,
+    seasonYear,
+    page,
+    perPage,
+  };
+  if (genre) variables.genre_in = [genre];
+
+  const data = await anilistFetch<{ Page: { media: AniListMedia[] } }>(
+    SEASON_QUERY,
+    variables
+  );
+  return data.Page.media;
+}
+
 export async function fetchTrendingAnime(
   page = 1,
-  perPage = 20
+  perPage = 20,
+  genre?: string
 ): Promise<AniListMedia[]> {
+  const variables: Record<string, unknown> = { page, perPage };
+  if (genre) variables.genre_in = [genre];
+
   const data = await anilistFetch<{ Page: { media: AniListMedia[] } }>(
     TRENDING_QUERY,
-    { page, perPage }
+    variables
   );
   return data.Page.media;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Search, BookOpen, User, Compass, Bookmark, Trophy } from "lucide-react";
+import { MapPin, Search, BookOpen, User, Compass, Bookmark, Trophy, Film } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AuthButton } from "@/components/auth-button";
 import { NotificationBell } from "@/components/layout/notification-bell";
@@ -16,6 +16,7 @@ export function Header() {
 
   const navLinks = [
     { href: "/spots", label: t("exploreSpots"), icon: MapPin },
+    { href: "/anime", label: t("animeBrowse"), icon: Film },
     { href: "/search", label: t("search"), icon: Search },
     { href: "/travelogue", label: t("travelogue"), icon: BookOpen },
     { href: "/feed", label: t("feed"), icon: Compass },

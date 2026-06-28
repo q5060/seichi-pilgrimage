@@ -61,7 +61,13 @@ export async function PATCH(
   const anilistId = Number(id);
   const body = await req.json();
 
-  if (body.pilgrimageStatus) {
+  const hasStatusUpdate =
+    body.pilgrimageStatus !== undefined ||
+    body.score !== undefined ||
+    body.review !== undefined ||
+    body.tags !== undefined;
+
+  if (hasStatusUpdate) {
     const existing = await db
       .select()
       .from(userAnimeStatus)
@@ -74,23 +80,31 @@ export async function PATCH(
       .limit(1);
 
     if (existing.length > 0) {
+      const updates: Record<string, unknown> = { updatedAt: new Date() };
+      if (body.pilgrimageStatus !== undefined) {
+        updates.status = body.pilgrimageStatus;
+      }
+      if (body.score !== undefined) {
+        updates.score = body.score;
+      }
+      if (body.review !== undefined) {
+        updates.review = body.review;
+      }
+      if (body.tags !== undefined) {
+        updates.tags = body.tags;
+      }
       await db
         .update(userAnimeStatus)
-        .set({
-          status: body.pilgrimageStatus,
-          score: body.score,
-          review: body.review,
-          updatedAt: new Date(),
-        })
+        .set(updates)
         .where(eq(userAnimeStatus.id, existing[0].id));
     } else {
       await db.insert(userAnimeStatus).values({
         userId: session.user.id,
         anilistId,
-        status: body.pilgrimageStatus,
-        score: body.score,
-        review: body.review,
-        tags: body.tags,
+        status: body.pilgrimageStatus ?? "want",
+        score: body.score ?? null,
+        review: body.review ?? null,
+        tags: body.tags ?? [],
       });
     }
   }

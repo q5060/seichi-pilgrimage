@@ -171,7 +171,7 @@ export default async function HomePage() {
         <HomeDeferredSections />
 
         <FadeIn delay={0.25}>
-          <SectionHeader title="熱門巡禮作品" href="/search" linkLabel="搜尋更多" />
+          <SectionHeader title="熱門巡禮作品" href="/anime" linkLabel="瀏覽全部" />
           {popularAnime.length > 0 ? (
             <StaggerChildren>
               <PosterRow>

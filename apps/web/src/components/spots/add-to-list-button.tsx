@@ -12,9 +12,11 @@ interface ListSummary {
 
 export function AddToListButton({
   spotId,
+  anilistId,
   iconOnly = false,
 }: {
-  spotId: string;
+  spotId?: string;
+  anilistId?: number;
   iconOnly?: boolean;
 }) {
   const router = useRouter();
@@ -23,6 +25,12 @@ export function AddToListButton({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const itemPayload = spotId
+    ? { spotId }
+    : anilistId != null
+      ? { anilistId }
+      : null;
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -34,13 +42,13 @@ export function AddToListButton({
   }, [isLoggedIn]);
 
   async function addToList(listId: string) {
-    if (!requireAuth()) return;
+    if (!requireAuth() || !itemPayload) return;
     setLoading(true);
     setMessage("");
     const res = await fetch(`/api/lists/${listId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ addItem: { spotId } }),
+      body: JSON.stringify({ addItem: itemPayload }),
     });
     setLoading(false);
     if (res.ok) {
@@ -53,14 +61,14 @@ export function AddToListButton({
   }
 
   async function createAndAdd() {
-    if (!requireAuth()) return;
+    if (!requireAuth() || !itemPayload) return;
     const title = prompt("新清單名稱");
     if (!title?.trim()) return;
     setLoading(true);
     const res = await fetch("/api/lists", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: title.trim(), items: [{ spotId }] }),
+      body: JSON.stringify({ title: title.trim(), items: [itemPayload] }),
     });
     setLoading(false);
     if (res.ok) {
@@ -69,6 +77,8 @@ export function AddToListButton({
       router.refresh();
     }
   }
+
+  if (!itemPayload) return null;
 
   if (status === "loading") return null;
 
