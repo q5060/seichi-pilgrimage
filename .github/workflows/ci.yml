@@ -79,6 +79,7 @@ jobs:
         env:
           CI: true
           AUTH_SECRET: ci-e2e-secret-at-least-32-characters-long
+          AUTH_URL: http://localhost:3000
           ENABLE_DEV_CREDENTIALS: "true"
           NEXT_PUBLIC_ENABLE_DEV_LOGIN: "true"
 

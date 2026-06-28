@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { devLogin, expectLoggedIn } from "./helpers/dev-login";
 
 test.describe("smoke", () => {
   test("homepage loads", async ({ page }) => {
@@ -9,7 +10,7 @@ test.describe("smoke", () => {
   test("search page loads with skeleton or results area", async ({ page }) => {
     await page.goto("/search");
     await expect(page.getByRole("heading", { name: "搜尋", level: 1 })).toBeVisible();
-    await page.getByPlaceholder(/作品名|聖地|遊記/).fill("東京");
+    await page.locator("#search-form input[type='search']").first().fill("東京");
     await page.locator("#search-form").press("Enter");
     await expect(page.locator(".animate-pulse, [class*='skeleton']").first()).toBeVisible({
       timeout: 5000,
@@ -31,7 +32,7 @@ test.describe("smoke", () => {
   test("search empty results for unlikely keyword", async ({ page }) => {
     await page.goto("/search");
     await page.getByRole("tab", { name: "聖地" }).click();
-    await page.getByPlaceholder(/作品名|作品/).fill("zzzznonexistentkeyword99999");
+    await page.locator("#search-form input[type='search']").first().fill("zzzznonexistentkeyword99999");
     await page.locator("#search-form").press("Enter");
     await expect(page.getByText("找不到結果")).toBeVisible({ timeout: 10000 });
   });
@@ -58,11 +59,8 @@ test.describe("smoke", () => {
   });
 
   test("dev credentials sign-in reaches settings", async ({ page }) => {
-    await page.goto("/auth/signin");
-    await page.getByRole("button", { name: "開發用登入" }).click();
-    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
-    await page.goto("/settings");
-    await expect(page.getByRole("heading", { name: /帳號設定|アカウント設定/ })).toBeVisible();
+    await devLogin(page);
+    await expectLoggedIn(page);
   });
 
   test("search page title in Japanese locale", async ({ page, context }) => {
@@ -85,11 +83,10 @@ test.describe("smoke", () => {
   });
 
   test("list detail loads after creating a list", async ({ page }) => {
-    await page.goto("/auth/signin");
-    await page.getByRole("button", { name: "開發用登入" }).click();
-    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
+    await devLogin(page);
 
     await page.goto("/lists/new");
+    await page.getByPlaceholder("清單名稱").waitFor({ state: "visible", timeout: 15000 });
     await page.getByPlaceholder("清單名稱").fill("E2E 測試清單");
     await page.getByRole("button", { name: "建立" }).click();
     await page.waitForURL(/\/lists\/[^/]+/, { timeout: 15000 });
@@ -97,11 +94,10 @@ test.describe("smoke", () => {
   });
 
   test("anime score saves without changing status", async ({ page }) => {
-    await page.goto("/auth/signin");
-    await page.getByRole("button", { name: "開發用登入" }).click();
-    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
+    await devLogin(page);
 
     await page.goto("/anime/21617");
+    await page.getByLabel("評分（1–10）").waitFor({ state: "visible", timeout: 15000 });
     await page.getByLabel("評分（1–10）").fill("9");
     await page.getByRole("button", { name: "儲存評價" }).click();
     await expect(page.getByText("已儲存")).toBeVisible({ timeout: 10000 });

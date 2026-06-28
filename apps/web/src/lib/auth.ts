@@ -8,6 +8,8 @@ import { eq } from "drizzle-orm";
 import { isDevCredentialsEnabled } from "./dev-auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  useSecureCookies: process.env.AUTH_URL?.startsWith("https://") ?? false,
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,

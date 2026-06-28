@@ -34,6 +34,8 @@ export default defineConfig({
             "ci-e2e-secret-at-least-32-characters-long",
           AUTH_URL: process.env.AUTH_URL ?? baseURL,
           AUTH_TRUST_HOST: "true",
+          ENABLE_DEV_CREDENTIALS: "true",
+          NEXT_PUBLIC_ENABLE_DEV_LOGIN: "true",
         },
       },
 });
