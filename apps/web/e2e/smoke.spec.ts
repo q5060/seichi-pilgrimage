@@ -97,12 +97,14 @@ test.describe("smoke", () => {
     await devLogin(page);
 
     await page.goto("/anime/21617");
-    await page.getByLabel("評分（1–10）").waitFor({ state: "visible", timeout: 15000 });
-    await page.getByLabel("評分（1–10）").fill("9");
+    await expect(page.getByText("載入狀態中...")).toBeHidden({ timeout: 15000 });
+    const scoreInput = page.getByLabel("評分（1–10）");
+    await scoreInput.fill("9");
     await page.getByRole("button", { name: "儲存評價" }).click();
     await expect(page.getByText("已儲存")).toBeVisible({ timeout: 10000 });
 
     await page.reload();
+    await expect(page.getByText("載入狀態中...")).toBeHidden({ timeout: 15000 });
     await expect(page.getByLabel("評分（1–10）")).toHaveValue("9");
   });
 });

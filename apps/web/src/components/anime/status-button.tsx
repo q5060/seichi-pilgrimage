@@ -107,8 +107,11 @@ export function AnimeStatusButton({ anilistId }: { anilistId: number }) {
       <form onSubmit={saveDetails} className="space-y-3 rounded-lg border border-subtle bg-surface/30 p-4">
         <p className="text-sm font-medium">我的評價</p>
         <div>
-          <label className="text-xs text-muted-foreground">評分（1–10）</label>
+          <label htmlFor={`anime-score-${anilistId}`} className="text-xs text-muted-foreground">
+            評分（1–10）
+          </label>
           <Input
+            id={`anime-score-${anilistId}`}
             type="number"
             min={1}
             max={10}
