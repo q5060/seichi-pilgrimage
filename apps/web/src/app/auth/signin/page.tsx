@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { FadeIn } from "@/components/ui/motion";
+import { isDevLoginUiEnabled } from "@/lib/dev-auth";
 
-const isProduction = process.env.NODE_ENV === "production";
+const devLoginEnabled = isDevLoginUiEnabled();
 
 export default function SignInPage() {
-  const [email, setEmail] = useState(isProduction ? "" : "demo@seichi.local");
-  const [name, setName] = useState(isProduction ? "" : "巡禮測試者");
+  const [email, setEmail] = useState(devLoginEnabled ? "demo@seichi.local" : "");
+  const [name, setName] = useState(devLoginEnabled ? "巡禮測試者" : "");
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center bg-background px-4">
@@ -43,7 +44,7 @@ export default function SignInPage() {
               使用 Discord 登入
             </Button>
 
-            {!isProduction && (
+            {!devLoginEnabled ? null : (
               <>
                 <div className="relative py-2">
                   <Separator className="bg-white/10" />

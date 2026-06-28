@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db, users, accounts, sessions, verificationTokens } from "@seichi/db";
 import { eq } from "drizzle-orm";
+import { isDevCredentialsEnabled } from "./dev-auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -37,7 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         name: { label: "名稱", type: "text" },
       },
       async authorize(credentials) {
-        if (process.env.NODE_ENV === "production") return null;
+        if (!isDevCredentialsEnabled()) return null;
         const email = credentials?.email as string;
         const name = (credentials?.name as string) || "測試使用者";
         if (!email) return null;
