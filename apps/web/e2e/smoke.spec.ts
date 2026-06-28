@@ -30,6 +30,7 @@ test.describe("smoke", () => {
 
   test("search empty results for unlikely keyword", async ({ page }) => {
     await page.goto("/search");
+    await page.getByRole("tab", { name: "聖地" }).click();
     await page.getByPlaceholder(/作品名|作品/).fill("zzzznonexistentkeyword99999");
     await page.locator("#search-form").press("Enter");
     await expect(page.getByText("找不到結果")).toBeVisible({ timeout: 10000 });

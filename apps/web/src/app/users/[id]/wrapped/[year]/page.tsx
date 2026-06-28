@@ -3,10 +3,10 @@ import Link from "next/link";
 import { db, users } from "@seichi/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
-import { computeWrappedStats } from "@/lib/achievements";
+import { getWrappedStats } from "@/lib/wrapped-data";
 import { getRequestLocale } from "@/lib/display-names-server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 export default async function WrappedPage({
   params,
@@ -29,7 +29,7 @@ export default async function WrappedPage({
   if (!user) notFound();
 
   const locale = await getRequestLocale();
-  const wrapped = await computeWrappedStats(userId, year, locale);
+  const wrapped = await getWrappedStats(userId, year, locale);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-brand-900 via-brand-800 to-background">

@@ -7,6 +7,7 @@ import {
 } from "@/lib/discovery";
 import { getHomePageSnapshot, type HomePageSnapshot } from "@/lib/home-data";
 import { HomeDeferredSections } from "@/components/home/home-deferred-sections";
+import { HomeDataUnavailableBanner } from "@/components/home/home-data-unavailable-banner";
 import { CinematicHero } from "@/components/ui/cinematic-hero";
 import { PosterCard } from "@/components/ui/poster-card";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -30,6 +31,7 @@ export default async function HomePage() {
   let stats: HomePageSnapshot["stats"] = [{ spotCount: 0, visitCount: 0 }];
   let seasonalPicks: Awaited<ReturnType<typeof getSeasonalPicks>> = [];
   let weeklyPopular: Awaited<ReturnType<typeof getWeeklyPopular>> = [];
+  let dataUnavailable = false;
 
   try {
     const snapshotPromise = getHomePageSnapshot();
@@ -48,7 +50,7 @@ export default async function HomePage() {
     popularAnime = snapshot.popularAnime;
     recentTravelogues = snapshot.recentTravelogues;
   } catch {
-    // Database unavailable
+    dataUnavailable = true;
   }
 
   const season = currentSeasonLabel();
@@ -66,6 +68,7 @@ export default async function HomePage() {
 
   return (
     <div className="bg-background text-foreground">
+      {dataUnavailable && <HomeDataUnavailableBanner />}
       <CinematicHero imageUrl={heroImage} alt={heroTitle} height="lg">
         <FadeIn>
           <h1 className="font-display text-display max-w-2xl">動畫聖地巡禮社群</h1>

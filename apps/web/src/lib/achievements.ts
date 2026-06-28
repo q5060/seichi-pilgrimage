@@ -9,7 +9,7 @@ import {
   spotAnimeLinks,
   anime,
 } from "@seichi/db";
-import { eq, and, gte, lt, sql } from "drizzle-orm";
+import { eq, and, gte, lt, sql, inArray } from "drizzle-orm";
 import { createNotification } from "./notifications";
 import { haversineDistance } from "./utils";
 import type { AppLocale } from "@/i18n/routing";
@@ -134,26 +134,30 @@ export async function computeWrappedStats(
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
-  const topAnime = await Promise.all(
-    topAnimeIds.map(async ([id, count]) => {
-      const [a] = await db
-        .select()
-        .from(anime)
-        .where(eq(anime.anilistId, Number(id)))
-        .limit(1);
-      const titles = a?.titles as {
-        chinese?: string;
-        native?: string;
-        romaji?: string;
-        english?: string;
-      };
-      return {
-        anilistId: Number(id),
-        title: getAnimeDisplayTitle(titles ?? {}, locale),
-        count,
-      };
-    })
-  );
+  const anilistIds = topAnimeIds.map(([id]) => Number(id));
+  const animeRows =
+    anilistIds.length > 0
+      ? await db
+          .select()
+          .from(anime)
+          .where(inArray(anime.anilistId, anilistIds))
+      : [];
+  const animeById = new Map(animeRows.map((a) => [a.anilistId, a]));
+
+  const topAnime = topAnimeIds.map(([id, visitCount]) => {
+    const a = animeById.get(Number(id));
+    const titles = a?.titles as {
+      chinese?: string;
+      native?: string;
+      romaji?: string;
+      english?: string;
+    };
+    return {
+      anilistId: Number(id),
+      title: getAnimeDisplayTitle(titles ?? {}, locale),
+      count: visitCount,
+    };
+  });
 
   const sortedVisits = [...userVisits].sort(
     (a, b) => a.visit.visitedAt.getTime() - b.visit.visitedAt.getTime()

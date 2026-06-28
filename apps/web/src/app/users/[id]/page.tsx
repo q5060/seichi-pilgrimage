@@ -13,7 +13,7 @@ import {
   animePilgrimageMeta,
   activities,
 } from "@seichi/db";
-import { eq, desc, count, and } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import {
   MapPin,
   Trophy,
@@ -27,7 +27,8 @@ import {
   Sparkles,
   List,
 } from "lucide-react";
-import { getUserAchievements, computeWrappedStats } from "@/lib/achievements";
+import { getProfileSummary } from "@/lib/profile-data";
+import { getWrappedStats } from "@/lib/wrapped-data";
 import { JapanMap } from "@/components/profile/japan-map";
 import { ProfileTabNav, type ProfileTab } from "@/components/profile/profile-tab-nav";
 import { AnimeListTable } from "@/components/profile/anime-list-table";
@@ -51,7 +52,7 @@ import {
   type PilgrimageStatus,
 } from "@seichi/shared";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const ACHIEVEMENT_ICONS: Record<AchievementId, typeof Trophy> = {
   first_visit: MapPin,
@@ -108,31 +109,14 @@ export default async function UserProfilePage({
   const currentYear = new Date().getFullYear();
 
   const [
-    visitStatRows,
-    travelogueStatRows,
-    prefectureList,
-    achievements,
+    profileSummary,
     visitList,
     userTravelogues,
     userLists,
     contributionActivities,
     animeRows,
   ] = await Promise.all([
-    db
-      .select({ count: count() })
-      .from(visits)
-      .where(eq(visits.userId, userId)),
-    db
-      .select({ count: count() })
-      .from(travelogues)
-      .where(eq(travelogues.userId, userId)),
-    db
-      .select({ prefecture: spots.prefecture })
-      .from(visits)
-      .innerJoin(spots, eq(visits.spotId, spots.id))
-      .where(eq(visits.userId, userId))
-      .groupBy(spots.prefecture),
-    getUserAchievements(userId),
+    getProfileSummary(userId),
     activeTab === "visits" || activeTab === "overview"
       ? db
           .select({ visit: visits, spot: spots })
@@ -195,13 +179,13 @@ export default async function UserProfilePage({
       : Promise.resolve([]),
   ]);
 
-  const visitStat = visitStatRows[0];
-  const travelogueStat = travelogueStatRows[0];
+  const { visitCount, travelogueCount, prefectureList, achievements } =
+    profileSummary;
 
   let wrapped = null;
   if (wrappedYear) {
     try {
-      wrapped = await computeWrappedStats(userId, Number(wrappedYear));
+      wrapped = await getWrappedStats(userId, Number(wrappedYear));
     } catch {
       // ignore
     }
@@ -238,9 +222,9 @@ export default async function UserProfilePage({
         <FadeIn>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {[
-              { label: "次打卡", value: visitStat?.count ?? 0 },
+              { label: "次打卡", value: visitCount },
               { label: "都道府縣", value: prefectureList.length },
-              { label: "篇遊記", value: travelogueStat?.count ?? 0 },
+              { label: "篇遊記", value: travelogueCount },
               { label: "巡禮作品", value: animeRows.length },
               { label: "貢獻分", value: user.contributionScore },
             ].map((stat) => (
