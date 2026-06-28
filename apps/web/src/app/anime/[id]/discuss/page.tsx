@@ -5,7 +5,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getAnimeDisplayTitleForRequest } from "@/lib/display-names-server";
 import { getOrSyncAnime } from "@/lib/anime-sync";
-import { CommentThread } from "@/components/social/CommentThread";
+import { LazyCommentThread } from "@/components/social/lazy-comment-thread";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +56,7 @@ export default async function AnimeDiscussPage({
       )}
 
       <section>
-        <CommentThread
+        <LazyCommentThread
           targetType="anime"
           targetId={String(anilistId)}
           link={`/anime/${anilistId}/discuss`}

@@ -78,8 +78,8 @@ export async function POST(
   await createNotification({
     userId: invitee.id,
     type: "route",
-    title: "路線協作邀請",
-    body: `你被邀請協作「${route.title}」`,
+    copyKey: "route_invite",
+    copyVars: { routeTitle: route.title },
     link: `/routes/${id}`,
   });
 

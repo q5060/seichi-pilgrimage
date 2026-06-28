@@ -20,6 +20,13 @@ export function LocaleSwitcher({ className }: { className?: string }) {
 
   function onChange(next: string) {
     document.cookie = `NEXT_LOCALE=${next};path=/;max-age=${60 * 60 * 24 * 365};SameSite=Lax`;
+    void fetch("/api/users/locale", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locale: next }),
+    }).catch(() => {
+      // cookie still applies for anonymous users
+    });
     startTransition(() => {
       router.refresh();
     });

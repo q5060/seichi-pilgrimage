@@ -71,8 +71,8 @@ export async function handleTraveloguePublish(params: {
   await createNotification({
     userId: params.userId,
     type: "travelogue_published",
-    title: "遊記已發布",
-    body: params.title,
+    copyKey: "travelogue_published",
+    copyVars: { targetTitle: params.title },
     link: `/travelogue/${params.slug}`,
   });
 }

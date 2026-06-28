@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import { PREFECTURES } from "@seichi/shared";
@@ -91,14 +92,14 @@ const POPULAR_CHIPS = [
 
 const TAB_CONFIG: {
   value: ResultType;
-  label: string;
+  labelKey: "typeAll" | "typeAnime" | "typeSpots" | "typeTravelogues" | "typeUsers";
   icon: typeof Film;
 }[] = [
-  { value: "all", label: "全部", icon: Search },
-  { value: "anime", label: "作品", icon: Film },
-  { value: "spots", label: "聖地", icon: MapPin },
-  { value: "travelogues", label: "遊記", icon: BookOpen },
-  { value: "users", label: "使用者", icon: User },
+  { value: "all", labelKey: "typeAll", icon: Search },
+  { value: "anime", labelKey: "typeAnime", icon: Film },
+  { value: "spots", labelKey: "typeSpots", icon: MapPin },
+  { value: "travelogues", labelKey: "typeTravelogues", icon: BookOpen },
+  { value: "users", labelKey: "typeUsers", icon: User },
 ];
 
 function getAnimeCover(a: SearchResults["anime"][0]): string | null {
@@ -125,6 +126,9 @@ function ResultSkeleton() {
 }
 
 export default function SearchPage() {
+  const t = useTranslations("search");
+  const tc = useTranslations("common");
+  const te = useTranslations("empty");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
@@ -196,7 +200,7 @@ export default function SearchPage() {
       try {
         const res = await fetch(`/api/search?${params}`);
         if (!res.ok) {
-          throw new Error("搜尋失敗");
+          throw new Error(t("errorTitle"));
         }
         const data = await res.json();
         setDbFallback(data.source === "db_fallback");
@@ -221,7 +225,7 @@ export default function SearchPage() {
       } catch {
         if (nextCursor === 0) {
           setResults(null);
-          setError("搜尋時發生錯誤，請稍後再試");
+          setError(t("errorDefault"));
         }
       } finally {
         setLoading(false);
@@ -236,6 +240,7 @@ export default function SearchPage() {
       hasPhotos,
       excludeSensitive,
       router,
+      t,
     ]
   );
 
@@ -278,10 +283,10 @@ export default function SearchPage() {
   const filterSections = useMemo(
     () => [
       {
-        title: "類型",
+        title: t("filterType"),
         children: (
           <div className="space-y-0.5">
-            {TAB_CONFIG.map(({ value, label, icon: Icon }) => (
+            {TAB_CONFIG.map(({ value, labelKey, icon: Icon }) => (
               <FilterLink
                 key={value}
                 active={type === value}
@@ -289,7 +294,7 @@ export default function SearchPage() {
               >
                 <span className="flex items-center gap-2">
                   <Icon className="h-3.5 w-3.5" />
-                  {label}
+                  {t(labelKey)}
                 </span>
               </FilterLink>
             ))}
@@ -299,14 +304,14 @@ export default function SearchPage() {
       ...(type === "all" || type === "spots"
         ? [
             {
-              title: "都道府縣",
+              title: t("filterPrefecture"),
               children: (
                 <div className="max-h-64 space-y-0.5 overflow-y-auto scrollbar-thin">
                   <FilterLink
                     active={!prefecture}
                     onClick={() => setPrefecture("")}
                   >
-                    全部
+                    {tc("all")}
                   </FilterLink>
                   {PREFECTURES.map((p) => (
                     <FilterLink
@@ -323,7 +328,7 @@ export default function SearchPage() {
           ]
         : []),
       {
-        title: "熱門搜尋",
+        title: t("popular"),
         children: (
           <div className="space-y-0.5">
             {POPULAR_CHIPS.map((chip) => (
@@ -340,7 +345,7 @@ export default function SearchPage() {
       ...(recentSearches.length > 0
         ? [
             {
-              title: "最近搜尋",
+              title: t("recent"),
               children: (
                 <div className="space-y-0.5">
                   {recentSearches.map((term) => (
@@ -357,7 +362,7 @@ export default function SearchPage() {
           ]
         : []),
     ],
-    [type, prefecture, recentSearches]
+    [type, prefecture, recentSearches, t, tc]
   );
 
   return (
@@ -369,8 +374,8 @@ export default function SearchPage() {
       <FadeIn>
         <PageHeader
           variant="centered"
-          title="搜尋"
-          description="探索作品、聖地、遊記與巡禮者"
+          title={t("title")}
+          description={t("description")}
         />
       </FadeIn>
 
@@ -387,12 +392,12 @@ export default function SearchPage() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="作品名、聖地、遊記..."
+                placeholder={t("placeholder")}
                 className="h-12 border-border bg-surface/80 pl-10 text-base"
               />
             </div>
             <Button type="submit" disabled={loading} size="lg" className="shrink-0">
-              {loading ? "搜尋中..." : "搜尋"}
+              {loading ? t("searching") : t("submit")}
             </Button>
           </div>
 
@@ -403,10 +408,10 @@ export default function SearchPage() {
                 onValueChange={(v) => setPrefecture(v === "all" ? "" : v)}
               >
                 <SelectTrigger className="w-[180px] border-border bg-surface/80">
-                  <SelectValue placeholder="全部都道府縣" />
+                  <SelectValue placeholder={t("allPrefectures")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部都道府縣</SelectItem>
+                  <SelectItem value="all">{t("allPrefectures")}</SelectItem>
                   {PREFECTURES.map((p) => (
                     <SelectItem key={p} value={p}>
                       {p}
@@ -421,7 +426,7 @@ export default function SearchPage() {
                   onChange={(e) => setHasComparison(e.target.checked)}
                   className="rounded border-white/20 bg-surface accent-primary"
                 />
-                有對比照
+                {t("hasComparison")}
               </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                 <input
@@ -430,7 +435,7 @@ export default function SearchPage() {
                   onChange={(e) => setHasPhotos(e.target.checked)}
                   className="rounded border-white/20 bg-surface accent-primary"
                 />
-                有照片
+                {t("hasPhotos")}
               </label>
               <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                 <input
@@ -439,14 +444,14 @@ export default function SearchPage() {
                   onChange={(e) => setExcludeSensitive(e.target.checked)}
                   className="rounded border-white/20 bg-surface accent-primary"
                 />
-                排除敏感聖地
+                {t("excludeSensitive")}
               </label>
               <Select value={season || "all"} onValueChange={(v) => setSeason(v === "all" ? "" : v)}>
                 <SelectTrigger className="w-[140px] border-border bg-surface/80">
-                  <SelectValue placeholder="季節" />
+                  <SelectValue placeholder={t("season")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部季節</SelectItem>
+                  <SelectItem value="all">{t("allSeasons")}</SelectItem>
                   {["春", "夏", "秋", "冬"].map((s) => (
                     <SelectItem key={s} value={s}>
                       {s}
@@ -466,10 +471,10 @@ export default function SearchPage() {
       <FadeIn delay={0.15} className="mt-6">
         <Tabs value={type} onValueChange={(v) => setType(v as ResultType)}>
           <TabsList className="glass w-full justify-start overflow-x-auto">
-            {TAB_CONFIG.map(({ value, label, icon: Icon }) => (
+            {TAB_CONFIG.map(({ value, labelKey, icon: Icon }) => (
               <TabsTrigger key={value} value={value} className="gap-1.5">
                 <Icon className="h-3.5 w-3.5" />
-                {label}
+                {t(labelKey)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -478,7 +483,7 @@ export default function SearchPage() {
             <TabsContent key={value} value={value} className="mt-6">
               {!searched && !loading && (
                 <div>
-                  <p className="mb-3 text-sm text-muted-foreground">熱門搜尋</p>
+                  <p className="mb-3 text-sm text-muted-foreground">{t("popular")}</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {POPULAR_CHIPS.map((chip) => (
                       <button
@@ -497,9 +502,9 @@ export default function SearchPage() {
               {error && !loading && (
                 <EmptyState
                   icon={Search}
-                  title="搜尋失敗"
+                  title={t("errorTitle")}
                   description={error}
-                  actionLabel="重試"
+                  actionLabel={tc("retry")}
                   onAction={() => search()}
                 />
               )}
@@ -576,20 +581,18 @@ export default function SearchPage() {
                   {!hasResults && (
                     <EmptyState
                       icon={Search}
-                      title="找不到結果"
+                      title={te("noResults")}
                       description={
-                        prefecture
-                          ? "試試清除都道府縣篩選或改用其他關鍵字"
-                          : "試試其他關鍵字或調整篩選條件"
+                        prefecture ? t("noResultsPrefecture") : t("noResultsDefault")
                       }
-                      actionLabel={prefecture ? "清除地區篩選" : undefined}
+                      actionLabel={prefecture ? t("clearPrefecture") : undefined}
                       onAction={prefecture ? () => setPrefecture("") : undefined}
                     />
                   )}
 
                   {dbFallback && hasResults && process.env.NODE_ENV === "development" && (
                     <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-                      Meilisearch 無結果，已改用資料庫搜尋（開發模式提示）
+                      {t("dbFallbackDev")}
                     </p>
                   )}
 
@@ -601,7 +604,7 @@ export default function SearchPage() {
                       disabled={loading}
                       className="w-full"
                     >
-                      {loading ? "載入中..." : "載入更多"}
+                      {loading ? tc("loading") : tc("loadMore")}
                     </Button>
                   )}
                 </div>

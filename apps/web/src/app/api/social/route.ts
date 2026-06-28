@@ -470,7 +470,8 @@ export async function POST(req: NextRequest) {
         await createNotification({
           userId: body.userId,
           type: "follow",
-          title: `${actorName} 開始追蹤你`,
+          copyKey: "follow",
+          copyVars: { actorName },
           link: `/users/${session.user.id}`,
         });
       }
@@ -566,7 +567,8 @@ export async function POST(req: NextRequest) {
         await createNotification({
           userId: ownerId,
           type: "like",
-          title: `${actorName} 按讚了你的內容`,
+          copyKey: "like",
+          copyVars: { actorName },
           link: body.link,
         });
       }
@@ -634,8 +636,8 @@ export async function POST(req: NextRequest) {
           await createNotification({
             userId: ownerId,
             type: "comment",
-            title: `${actorName} 留言了`,
-            body: body.body.slice(0, 100),
+            copyKey: "comment",
+            copyVars: { actorName, body: body.body.slice(0, 100) },
             link: body.link,
           });
         }

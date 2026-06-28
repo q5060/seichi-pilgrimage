@@ -1,5 +1,13 @@
 import { db, notifications, animeFollows, regionFollows } from "@seichi/db";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { sendPush } from "@/lib/push";
+import {
+  getNotificationCopy,
+  type NotificationCopyKey,
+  type NotificationCopyVars,
+} from "@/lib/notification-copy";
+import { getUserPreferredLocale } from "@/lib/user-locale";
+import type { AppLocale } from "@/i18n/routing";
 
 export async function notifyAnimeFollowers(params: {
   anilistIds: number[];
@@ -16,7 +24,7 @@ export async function notifyAnimeFollowers(params: {
       .where(eq(animeFollows.animeId, anilistId));
 
     for (const { userId } of followers) {
-      await db.insert(notifications).values({
+      await createNotification({
         userId,
         type: "anime_spot",
         title: params.title,
@@ -39,7 +47,7 @@ export async function notifyRegionFollowers(params: {
     .where(eq(regionFollows.region, params.prefecture));
 
   for (const { userId } of followers) {
-    await db.insert(notifications).values({
+    await createNotification({
       userId,
       type: "region_spot",
       title: params.title,
@@ -52,9 +60,37 @@ export async function notifyRegionFollowers(params: {
 export async function createNotification(params: {
   userId: string;
   type: string;
-  title: string;
+  title?: string;
   body?: string;
   link?: string;
+  copyKey?: NotificationCopyKey;
+  copyVars?: NotificationCopyVars;
+  locale?: AppLocale;
 }) {
-  await db.insert(notifications).values(params);
+  let title = params.title;
+  let body = params.body;
+
+  if (params.copyKey) {
+    const locale =
+      params.locale ?? (await getUserPreferredLocale(params.userId));
+    const copy = getNotificationCopy(params.copyKey, locale, params.copyVars ?? {});
+    title = copy.title;
+    body = copy.body ?? body;
+  }
+
+  if (!title) return;
+
+  await db.insert(notifications).values({
+    userId: params.userId,
+    type: params.type,
+    title,
+    body,
+    link: params.link,
+  });
+
+  void sendPush(params.userId, {
+    title,
+    body,
+    url: params.link,
+  });
 }

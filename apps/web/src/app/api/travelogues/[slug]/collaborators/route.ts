@@ -93,8 +93,8 @@ export async function POST(
   await createNotification({
     userId: invitee.id,
     type: "travelogue",
-    title: "遊記協作邀請",
-    body: `你被邀請協作「${travelogue.title}」`,
+    copyKey: "travelogue_collaborator",
+    copyVars: { targetTitle: travelogue.title },
     link: `/travelogue/${slug}/edit`,
   });
 

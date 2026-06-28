@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Bell } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useFormatDate } from "@/hooks/use-format-date";
 import { PageHeader } from "@/components/ui/page-header";
 import { Card } from "@/components/ui/card";
@@ -12,7 +13,6 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { PageShell } from "@/components/layout/page-shell";
-import { NOTIFICATION_TYPE_LABELS } from "@/lib/notification-labels";
 
 interface NotificationItem {
   id: string;
@@ -35,6 +35,8 @@ function NotificationSkeleton() {
 }
 
 export default function NotificationsPage() {
+  const t = useTranslations("notifications");
+  const tc = useTranslations("common");
   const formatDate = useFormatDate();
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -42,25 +44,27 @@ export default function NotificationsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loadFailedMsg = t("loadFailedDescription");
+
   const load = useCallback(async (cursor?: string, append = false) => {
     const params = new URLSearchParams({ limit: "30" });
     if (cursor) params.set("cursor", cursor);
 
     const res = await fetch(`/api/notifications?${params}`);
     if (!res.ok) {
-      throw new Error("載入通知失敗");
+      throw new Error(t("loadFailed"));
     }
     const data = await res.json();
     setItems((prev) => (append ? [...prev, ...(data.items ?? [])] : data.items ?? []));
     setNextCursor(data.nextCursor ?? null);
     setError(null);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load()
-      .catch(() => setError("無法載入通知，請稍後再試"))
+      .catch(() => setError(loadFailedMsg))
       .finally(() => setLoading(false));
-  }, [load]);
+  }, [load, loadFailedMsg]);
 
   async function loadMore() {
     if (!nextCursor || loadingMore) return;
@@ -81,15 +85,23 @@ export default function NotificationsPage() {
     setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
   }
 
+  function typeLabel(type: string) {
+    try {
+      return t(`types.${type}` as "types.follow");
+    } catch {
+      return type;
+    }
+  }
+
   return (
     <PageShell variant="narrow">
       <PageHeader
-        title="通知"
-        description="追蹤、互動、審核與成就相關的站內訊息"
+        title={t("title")}
+        description={t("description")}
         action={
           items.some((n) => !n.isRead) ? (
             <Button variant="outline" size="sm" onClick={markAllRead}>
-              全部已讀
+              {t("markAllRead")}
             </Button>
           ) : undefined
         }
@@ -100,22 +112,22 @@ export default function NotificationsPage() {
       ) : error ? (
         <EmptyState
           icon={Bell}
-          title="載入失敗"
+          title={t("loadFailed")}
           description={error}
-          actionLabel="重試"
+          actionLabel={tc("retry")}
           onAction={() => {
             setLoading(true);
             setError(null);
             load()
-              .catch(() => setError("無法載入通知，請稍後再試"))
+              .catch(() => setError(loadFailedMsg))
               .finally(() => setLoading(false));
           }}
         />
       ) : items.length === 0 ? (
         <EmptyState
           icon={Bell}
-          title="尚無通知"
-          description="當有人與你互動或追蹤內容有更新時，會顯示在這裡"
+          title={t("empty")}
+          description={t("emptyDescription")}
         />
       ) : (
         <div className="space-y-3">
@@ -130,7 +142,7 @@ export default function NotificationsPage() {
                 <div className="flex items-start justify-between gap-2">
                   <p className="font-medium">{n.title}</p>
                   <Badge variant="secondary" className="shrink-0 text-xs">
-                    {NOTIFICATION_TYPE_LABELS[n.type] ?? n.type}
+                    {typeLabel(n.type)}
                   </Badge>
                 </div>
                 {n.body && (
@@ -145,7 +157,7 @@ export default function NotificationsPage() {
           {nextCursor && (
             <div className="pt-2 text-center">
               <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
-                {loadingMore ? "載入中..." : "載入更多"}
+                {loadingMore ? tc("loading") : tc("loadMore")}
               </Button>
             </div>
           )}

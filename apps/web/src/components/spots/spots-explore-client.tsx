@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { PREFECTURES } from "@seichi/shared";
 import { MapPin, Search } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -58,13 +59,14 @@ function SpotGridSkeleton() {
 }
 
 function ExploreNearbySpots() {
+  const t = useTranslations("spots");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [geoError, setGeoError] = useState("");
   const [requesting, setRequesting] = useState(false);
 
   function requestLocation() {
     if (!navigator.geolocation) {
-      setGeoError("此裝置不支援定位");
+      setGeoError(t("geoUnsupported"));
       return;
     }
     setRequesting(true);
@@ -78,7 +80,7 @@ function ExploreNearbySpots() {
         setRequesting(false);
       },
       () => {
-        setGeoError("無法取得位置，請確認已授權定位");
+        setGeoError(t("geoDenied"));
         setRequesting(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
@@ -94,7 +96,7 @@ function ExploreNearbySpots() {
         disabled={requesting}
       >
         <MapPin className="h-4 w-4" />
-        {requesting ? "定位中..." : "附近聖地"}
+        {requesting ? t("locating") : t("nearby")}
       </Button>
     );
   }
@@ -112,6 +114,8 @@ export function SpotsExploreClient({
   initialNextCursor,
   initialPrefecture = "all",
 }: SpotsExploreClientProps) {
+  const t = useTranslations("spots");
+  const tc = useTranslations("common");
   const [spots, setSpots] = useState<SpotItem[]>(initialSpots);
   const [nextCursor, setNextCursor] = useState<number | null>(initialNextCursor);
   const [prefecture, setPrefecture] = useState(initialPrefecture);
@@ -180,14 +184,14 @@ export function SpotsExploreClient({
 
   const filterSections = [
     {
-      title: "都道府縣",
+      title: t("prefectureFilter"),
       children: (
         <div className="space-y-0.5">
           <FilterLink
             active={prefecture === "all"}
             onClick={() => handlePrefectureChange("all")}
           >
-            全部地區
+            {t("allRegions")}
           </FilterLink>
           {PREFECTURES.map((p) => (
             <FilterLink
@@ -210,14 +214,14 @@ export function SpotsExploreClient({
 
         <div className="min-w-0 flex-1 animate-fade-in">
           <PageHeader
-            title="探索聖地"
-            description="瀏覽全日本動畫取景地，依地區篩選或搜尋名稱"
+            title={t("title")}
+            description={t("description")}
             action={
               <div className="flex items-center gap-2">
                 <FilterDrawer sections={filterSections} />
                 <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
                   <Link href="/spots/map" prefetch={false}>
-                    地圖模式
+                    {t("mapMode")}
                   </Link>
                 </Button>
                 <div className="hidden md:block">
@@ -231,7 +235,7 @@ export function SpotsExploreClient({
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="搜尋聖地名稱..."
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
@@ -239,10 +243,10 @@ export function SpotsExploreClient({
             </div>
             <Select value={prefecture} onValueChange={handlePrefectureChange}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="選擇都道府縣" />
+                <SelectValue placeholder={t("selectPrefecture")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">全部地區</SelectItem>
+                <SelectItem value="all">{t("allRegions")}</SelectItem>
                 {PREFECTURES.map((p) => (
                   <SelectItem key={p} value={p}>
                     {p}
@@ -257,13 +261,11 @@ export function SpotsExploreClient({
           ) : filteredSpots.length === 0 ? (
             <EmptyState
               icon={MapPin}
-              title={search ? "找不到符合的聖地" : "此地區尚無聖地"}
+              title={search ? t("emptySearchTitle") : t("emptyRegionTitle")}
               description={
-                search
-                  ? "試試其他關鍵字或清除篩選條件"
-                  : "歡迎成為第一個新增此地區聖地的人"
+                search ? t("emptySearchDescription") : t("emptyRegionDescription")
               }
-              actionLabel={search ? undefined : "新增聖地"}
+              actionLabel={search ? undefined : t("addSpot")}
               actionHref={search ? undefined : "/spots/new"}
             />
           ) : (
@@ -288,7 +290,7 @@ export function SpotsExploreClient({
                     onClick={loadMore}
                     disabled={loadingMore}
                   >
-                    {loadingMore ? "載入中..." : "載入更多"}
+                    {loadingMore ? tc("loading") : tc("loadMore")}
                   </Button>
                 </div>
               )}

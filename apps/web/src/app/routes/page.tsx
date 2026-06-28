@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRequireAuth } from "@/lib/require-auth-client";
 import { useFormatDate } from "@/hooks/use-format-date";
 import { Route } from "lucide-react";
@@ -34,6 +35,8 @@ function RoutesSkeleton() {
 }
 
 export default function RoutesPage() {
+  const t = useTranslations("routes");
+  const tc = useTranslations("common");
   const formatDate = useFormatDate();
   const { requireAuth, status } = useRequireAuth();
   const [routes, setRoutes] = useState<RouteRow[]>([]);
@@ -63,13 +66,13 @@ export default function RoutesPage() {
   return (
     <PageShell variant="prose">
       <PageHeader
-        title="我的路線"
-        description="規劃與管理巡禮路線"
+        title={t("title")}
+        description={t("description")}
         action={
           <Button asChild>
             <Link href="/routes/new">
               <Route className="h-4 w-4" />
-              規劃新路線
+              {t("newRoute")}
             </Link>
           </Button>
         }
@@ -78,9 +81,9 @@ export default function RoutesPage() {
       {routes.length === 0 ? (
         <EmptyState
           icon={Route}
-          title="尚無路線"
-          description="開始規劃你的巡禮之旅吧！"
-          actionLabel="建立路線"
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+          actionLabel={t("createRoute")}
           actionHref="/routes/new"
         />
       ) : (
@@ -97,20 +100,24 @@ export default function RoutesPage() {
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {route.totalDistanceM != null && (
                     <Badge variant="secondary">
-                      約 {(route.totalDistanceM / 1000).toFixed(1)} km
+                      {t("distanceKm", {
+                        km: (route.totalDistanceM / 1000).toFixed(1),
+                      })}
                     </Badge>
                   )}
                   {route.estimatedMinutes != null && (
                     <Badge variant="secondary">
-                      預估 {Math.floor(route.estimatedMinutes / 60)}h{" "}
-                      {route.estimatedMinutes % 60}m
+                      {t("estimatedTime", {
+                        hours: Math.floor(route.estimatedMinutes / 60),
+                        minutes: route.estimatedMinutes % 60,
+                      })}
                     </Badge>
                   )}
                   <Badge variant={route.isPublic ? "default" : "outline"}>
-                    {route.isPublic ? "公開" : "私人"}
+                    {route.isPublic ? tc("public") : tc("private")}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
-                    更新於 {formatDate(route.updatedAt)}
+                    {t("updatedAt", { date: formatDate(route.updatedAt) })}
                   </span>
                 </div>
               </Card>

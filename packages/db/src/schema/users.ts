@@ -22,6 +22,7 @@ export const users = pgTable("users", {
   defaultPrivacy: text("default_privacy").$type<PrivacyLevel>().notNull().default("public"),
   contributionScore: integer("contribution_score").notNull().default(0),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
+  preferredLocale: text("preferred_locale").notNull().default("zh-TW"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

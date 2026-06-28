@@ -38,8 +38,8 @@ export async function grantAchievement(
   await createNotification({
     userId,
     type: "achievement",
-    title: "獲得新成就",
-    body: achievement.name,
+    copyKey: "achievement",
+    copyVars: { achievementName: achievement.name },
     link: `/users/${userId}?tab=overview`,
   });
 

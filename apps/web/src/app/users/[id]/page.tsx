@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { getProfileSummary } from "@/lib/profile-data";
 import { getWrappedStats } from "@/lib/wrapped-data";
-import { JapanMap } from "@/components/profile/japan-map";
+import { JapanMap } from "@/components/profile/japan-map-loader";
 import { ProfileTabNav, type ProfileTab } from "@/components/profile/profile-tab-nav";
 import { AnimeListTable } from "@/components/profile/anime-list-table";
 import { FormattedDate } from "@/components/ui/formatted-date";

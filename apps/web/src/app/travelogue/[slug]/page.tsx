@@ -1,6 +1,7 @@
-import { db, travelogues, users } from "@seichi/db";
-import { eq } from "drizzle-orm";
+import { getPublishedTravelogue } from "@/lib/travelogue-data";
 import { notFound } from "next/navigation";
+import { db, travelogues } from "@seichi/db";
+import { eq } from "drizzle-orm";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -19,7 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 function getHeroImage(
   blocks: TravelogueBlock[],
@@ -45,14 +46,19 @@ export default async function TraveloguePage({
 }) {
   const { slug } = await params;
 
-  const [result] = await db
-    .select({ travelogue: travelogues, author: users })
-    .from(travelogues)
-    .innerJoin(users, eq(travelogues.userId, users.id))
-    .where(eq(travelogues.slug, slug))
-    .limit(1);
-
-  if (!result) notFound();
+  let result = await getPublishedTravelogue(slug);
+  if (!result) {
+    const { db, travelogues, users } = await import("@seichi/db");
+    const { eq } = await import("drizzle-orm");
+    const [row] = await db
+      .select({ travelogue: travelogues, author: users })
+      .from(travelogues)
+      .innerJoin(users, eq(travelogues.userId, users.id))
+      .where(eq(travelogues.slug, slug))
+      .limit(1);
+    if (!row) notFound();
+    result = row;
+  }
 
   const { travelogue: t, author } = result;
   const blocks = (t.content ?? []) as TravelogueBlock[];

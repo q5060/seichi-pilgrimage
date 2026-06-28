@@ -56,4 +56,25 @@ test.describe("smoke", () => {
     await page.getByRole("button", { name: /更多|もっと見る/ }).click();
     await expect(page.getByRole("link", { name: /動態|タイムライン/ })).toBeVisible();
   });
+
+  test("dev credentials sign-in reaches settings", async ({ page }) => {
+    await page.goto("/auth/signin");
+    await page.getByRole("button", { name: "開發用登入" }).click();
+    await page.waitForURL(/\/(settings|users\/me)?/, { timeout: 15000 });
+    await page.goto("/settings");
+    await expect(page.getByRole("heading", { name: /帳號設定|アカウント設定/ })).toBeVisible();
+  });
+
+  test("search page title in Japanese locale", async ({ page, context }) => {
+    await context.addCookies([
+      {
+        name: "NEXT_LOCALE",
+        value: "ja",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+    await page.goto("/search");
+    await expect(page.getByRole("heading", { name: "検索", level: 1 })).toBeVisible();
+  });
 });

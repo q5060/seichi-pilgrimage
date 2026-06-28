@@ -77,8 +77,11 @@ export async function POST(
     await createNotification({
       userId: spot.createdById,
       type: "helpful",
-      title: `${session.user.name ?? "某位巡禮者"} 覺得你的聖地資訊有幫助`,
-      body: spot.nameZh,
+      copyKey: "helpful",
+      copyVars: {
+        actorName: session.user.name ?? "某位巡禮者",
+        targetTitle: spot.nameZh,
+      },
       link: `/spots/${id}`,
     });
   }

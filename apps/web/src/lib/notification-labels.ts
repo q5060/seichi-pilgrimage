@@ -1,3 +1,4 @@
+/** @deprecated Use useTranslations("notifications.types") in client components */
 export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   follow: "追蹤",
   like: "按讚",

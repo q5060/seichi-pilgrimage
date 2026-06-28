@@ -1,6 +1,6 @@
-import { db, userFollows, notifications } from "@seichi/db";
+import { db, userFollows } from "@seichi/db";
 import { eq } from "drizzle-orm";
-import { sendPush } from "@/lib/push";
+import { createNotification } from "@/lib/notifications";
 
 export async function notifyFollowersOfActivity(params: {
   actorId: string;
@@ -16,17 +16,12 @@ export async function notifyFollowersOfActivity(params: {
 
   for (const { userId } of followers) {
     if (userId === params.actorId) continue;
-    await db.insert(notifications).values({
+    await createNotification({
       userId,
       type: params.type,
       title: params.title,
       body: params.body,
       link: params.link,
-    });
-    void sendPush(userId, {
-      title: params.title,
-      body: params.body,
-      url: params.link,
     });
   }
 }
@@ -37,11 +32,11 @@ export async function notifyModerationResult(params: {
   targetLabel: string;
   link?: string;
 }) {
-  await db.insert(notifications).values({
+  await createNotification({
     userId: params.userId,
     type: "moderation",
-    title: params.approved ? "審核通過" : "審核未通過",
-    body: params.targetLabel,
+    copyKey: params.approved ? "moderation_approved" : "moderation_rejected",
+    copyVars: { targetTitle: params.targetLabel },
     link: params.link,
   });
 }

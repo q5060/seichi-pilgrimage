@@ -17,7 +17,7 @@ import { ExportTravelogueButton } from "@/components/routes/export-travelogue-bu
 import { getSpotDisplayNameForRequest } from "@/lib/display-names-server";
 import { canEditRoute } from "@/lib/collaboration";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function RoutePage({
   params,
